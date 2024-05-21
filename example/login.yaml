@@ -11,3 +11,6 @@ prefix: '!'
 
 # After how many consecutive messages from a user to send a message
 msg-limit: 10
+
+# Randomly activate due to keywords
+bot-activate-from-keywords: true

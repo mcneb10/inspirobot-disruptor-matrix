@@ -30,6 +30,22 @@ AutojoinRoomsMixin.setupOnClient(client);
 //do not include replied message in message
 client.addPreprocessor(new RichRepliesPreprocessor(false));
 
+// import keywords, make sure tsConfig has compilerOptions.resolveJsonModule=true
+import keywords from "keywords.json";
+
+// try to detect key words and print based on probability set
+function maybePrintFromKeywords(body) {
+	if(!loginParsed["bot-activate-from-keywords"]) return false;
+ 	body.toLowerCase().split(/[\s\r\n]+/).forEach(word => {
+		// weight should be 0-1
+		let weight = keywords[word];
+		if(weight !== undefined && weight >= Math.random()) {
+			return true;
+		}
+	});
+	return false;
+}
+
 const filter = {
 	//dont expect any presence from m.org, but in the case presence shows up its irrelevant to this bot
 	presence: { senders: [] },
@@ -72,7 +88,7 @@ client.on("room.event", async (roomId, event) => {
 			event,
 			"You can find usage information and source code available at https://github.com/jjj333-p/matrix-word-counter",
 		);
-	} else if (body.startsWith(`${prefix}inspire`)) {
+	} else if (body.startsWith(`${prefix}inspire`) || maybePrintFromKeywords(body)) {
 		//api to generate a quote image
 		let imageUrl;
 		try {
